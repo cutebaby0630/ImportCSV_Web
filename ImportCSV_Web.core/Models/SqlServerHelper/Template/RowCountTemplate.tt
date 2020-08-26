@@ -1,0 +1,13 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".txt" #>
+SELECT S.NAME 'SchemaName', O.NAME 'TableName', P.ROWS 'RowCount'
+FROM SYS.OBJECTS O INNER JOIN SYS.SCHEMAS S
+ON O.SCHEMA_ID = S.SCHEMA_ID
+INNER JOIN SYS.PARTITIONS P
+ON O.OBJECT_ID = P.OBJECT_ID
+WHERE (O.TYPE = 'U') AND (P.INDEX_ID IN (0,1))
+ORDER BY S.NAME, O.NAME ASC

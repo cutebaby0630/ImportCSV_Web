@@ -1,0 +1,51 @@
+﻿<#@ template debug="true" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ output extension=".cs" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+
+SELECT S1.NAME TableName, --AS 資料表名稱,
+        schema_name(s1.schema_id) SchemaName,--AS 結構名稱,
+        S1.MAX_COLUMN_ID_USED ColumnCount,--AS 欄位數,
+    S4.MaxLength ,--AS 總長度,
+    ISNULL(S3.VALUE,'') TableDescription, --AS 資料表描述,
+    ISNULL(S2.NAME,'') PrimaryKeyName,--AS 主鍵名稱,
+    s1.CREATE_DATE CreateDate,--AS 建立時間,
+    S1.MODIFY_DATE ModifyDate, --AS 修改時間
+	s5.ROWS [RowCount]
+    FROM SYS.TABLES S1
+    LEFT JOIN (SELECT * FROM SYS.OBJECTS S WHERE TYPE = 'PK') S2 ON S1.OBJECT_ID = S2.parent_object_id 
+    LEFT JOIN ( 
+		SELECT T.Name , Convert(Varchar(500),P.Value) as Value
+		FROM SYS.EXTENDED_PROPERTIES P
+		INNER JOIN SYS.objects T  ON P.MAJOR_ID = T.OBJECT_ID 
+		LEFT JOIN SYS.TABLES O ON T.parent_object_id = O.object_id
+		INNER JOIN SYS.schemas S ON T.schema_id = S.schema_id 
+		LEFT JOIN SYS.COLUMNS C ON T.object_id = c.object_id and P.MINOR_ID = C.column_id  
+		LEFT JOIN SYS.indexes I  ON T.object_id = I.object_id and P.MINOR_ID = I.INDEX_id 
+		WHERE P.CLASS = 1 AND T.TYPE = 'U' AND C.Name IS NULL
+	) S3  ON S1.NAME = S3.NAME
+    JOIN (
+		select 
+			sys.objects.[name], 
+			sys.objects.[object_id], 
+			count(sys.columns.[name]) As ColumnCount, 
+			sum(sys.columns.max_length) As MaxLength
+		from sys.objects 
+		inner join sys.columns on sys.objects.object_id = sys.columns.object_id
+		group by sys.objects.[name], sys.objects.[object_id]
+	) S4 on s1.NAME = s4.NAME
+	LEFT JOIN (
+		SELECT sys.objects.NAME, sum(sys.partitions.ROWS) ROWS 
+		FROM sys.objects  
+		INNER JOIN sys.schemas ON sys.objects.SCHEMA_ID = sys.schemas.SCHEMA_ID
+		INNER JOIN sys.partitions ON sys.objects.OBJECT_ID = sys.partitions.OBJECT_ID
+		WHERE (sys.objects.TYPE = 'U') AND (sys.partitions.INDEX_ID IN (0,1))
+		group BY sys.objects.NAME
+	) s5 ON s1.name = s5.NAME
+    WHERE s1.is_ms_shipped = 0
+    AND (s1.NAME NOT LIKE 'DDSC[_]%'
+    AND s1.NAME NOT LIKE 'STG[_]%'
+    AND s1.NAME NOT LIKE 'ERR[_]%')
+    ORDER BY 1

@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<div class="form-group" style="margin-bottom:20px;margin-top:20px">
+    <form action="/Main/Index" method="post" enctype="multipart/form-data">
+        <label class="control-label col-10">選擇上傳檔案</label>
+        <input name="file" type="file" id="file" />
+        <input type="submit" name="Upload" value="Upload" style="background-color: #CCDDFF; color:#194284;float:right;margin-top:10px;" />
+    </form>
+</div>
+
+<div id="servername">
+    <label class="control-label col-10">選擇比對環境</label>
+    <select class="input-txt-smp pad2 form-control col-10" style="width:auto;" v-model="Server" id="server">
+        <option v-bind:value="-1">Select</option>
+        <option v-for="servers in server" v-bind:value="servers.id">
+            {{servers.Name}}
+        </option>
+    </select>
+</div>
+<script type="text/x-template" id="grid-template">
+    <table>
+        <thead>
+            <tr>
+                <th v-for="key in columns">{{key}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="entry in data">
+                <td v-for="key in columns">{{entry[key]}}</td>
+            </tr>
+        </tbody>
+    </table>
+</script>
+
+
+<div class="fullcompare_box" id="full_compare" style="height:325px;margin-top:20px">
+    <div id="demo">
+        <demo-grid :data="gridData"
+                   :columns="gridColumns">
+        </demo-grid>
+    </div>
+</div>
+<input type="button" value="Submit" class="btn btn_submit" style="background-color: #CCDDFF; color:#194284;float:right;margin-top:10px;" />
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="img" />
+    <button>Submit</button>
+</form>
+
+
+<style>
+    .fullcompare_box {
+        background-color: rgba(76, 115, 178, 0.52 );
+        height: 100%;
+        width: 100%;
+    }
+</style>

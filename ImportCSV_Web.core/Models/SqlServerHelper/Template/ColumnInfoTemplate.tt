@@ -1,0 +1,55 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".txt" #>
+SELECT 
+    CLV.[TABLE_NAME] TableName,               --AS 資料表名稱,
+    CLV.[COLUMN_NAME] ColumnName,              --AS 欄位名稱,
+    CLV.ORDINAL_POSITION OrdinalPosition, --AS 順序
+    CASE WHEN PK.TABLE_NAME IS NOT NULL THEN 1 ELSE 0 END AS IsPrimaryKey ,
+    UPPER(CLV.[DATA_TYPE]) DataType,
+    CASE WHEN CLV.[DATA_TYPE] IN ('Decimal','numeric') THEN ISNULL(CONVERT(VARCHAR(5),CLV.[NUMERIC_PRECISION]),'')+','+ ISNULL(CONVERT(VARCHAR(5),CLV.[NUMERIC_SCALE]),'0')
+            WHEN CLV.[DATA_TYPE] = 'datetime2'  THEN CONVERT(VARCHAR(5),ISNULL(CLV.DATETIME_PRECISION,0))
+            WHEN CLV.[DATA_TYPE] LIKE '%int%' OR CLV.[DATA_TYPE] LIKE '%date%' THEN ''
+		    WHEN CLV.[DATA_TYPE] IN ('char','varchar','nchar','nvarchar') AND [CHARACTER_MAXIMUM_LENGTH] = '-1'
+		    THEN  'MAX'
+		    ELSE  ISNULL(CONVERT(VARCHAR(5),CLV.[CHARACTER_MAXIMUM_LENGTH]),'') END DataLen,
+
+    CASE WHEN CLV.[DATA_TYPE] IN ('Decimal','numeric') 
+    THEN UPPER(CLV.[DATA_TYPE])+'('+ISNULL(CONVERT(VARCHAR(5),CLV.[NUMERIC_PRECISION]),'')+','+ ISNULL(CONVERT(VARCHAR(5),CLV.[NUMERIC_SCALE]),'0') + ')'
+    WHEN CLV.[DATA_TYPE] = 'datetime2'
+    THEN UPPER(CLV.[DATA_TYPE])+ '(' + CONVERT(VARCHAR(5),ISNULL(CLV.DATETIME_PRECISION,0)) +')'
+    WHEN CLV.[DATA_TYPE] LIKE '%int%' OR CLV.[DATA_TYPE] LIKE '%date%' 
+    THEN UPPER(CLV.[DATA_TYPE])
+    WHEN CLV.[DATA_TYPE] IN ('char','varchar','nchar','nvarchar') AND [CHARACTER_MAXIMUM_LENGTH] = '-1'
+    THEN UPPER(CLV.[DATA_TYPE]) + '(MAX)'
+    ELSE UPPER(CLV.[DATA_TYPE]) + '(' + ISNULL(CONVERT(VARCHAR(5),CLV.[CHARACTER_MAXIMUM_LENGTH]),'') +')' END DataTypeName, -- AS 型態,
+
+    ISNULL((SELECT VALUE             
+            FROM fn_listextendedproperty (NULL, 'schema', CLV.TABLE_SCHEMA , 'table', CLV.TABLE_NAME, 'column', default)   
+            WHERE objtype='COLUMN'    
+            AND name = 'MS_Description' 
+            AND objname Collate Chinese_Taiwan_Stroke_CI_AS = CLV.COLUMN_NAME),'') ColumnDescription,  --AS 欄位描述,     
+    ISNULL(COLUMN_DEFAULT,'') ColumnDefault, --AS 預設值,
+    CASE WHEN CLV.IS_NULLABLE  = 'YES' THEN 1 ELSE 0 END IsNullable,--AS 允許NULL,
+    CASE WHEN ISNULL(ident.is_identity,0) = 1 THEN 1 ELSE 0 END IsIdentity,
+    CL.collation_name [CollationName]
+FROM SYS.OBJECTS OB
+JOIN SYS.COLUMNS CL
+ON OB.OBJECT_ID = CL.OBJECT_ID 
+JOIN INFORMATION_SCHEMA.COLUMNS CLV
+ON OB.NAME = CLV.TABLE_NAME AND CL.NAME = CLV.COLUMN_NAME 
+LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE PK
+    ON (CLV.[TABLE_NAME] = PK.[TABLE_NAME] 
+    AND CLV.[COLUMN_NAME] = PK.[COLUMN_NAME]
+    AND PK.CONSTRAINT_NAME LIKE 'PK%')
+LEFT JOIN sys.identity_columns ident 
+	on OB.object_id = ident.object_id 
+	and CL.column_id = ident.column_id
+WHERE OB.is_ms_shipped = 0 AND TYPE = 'U'
+AND CLV.TABLE_NAME NOT LIKE 'ERR[_]%'
+AND CLV.TABLE_NAME NOT LIKE 'DDSC[_]%'
+AND CLV.TABLE_NAME NOT LIKE 'STG[_]%'
+ORDER BY CLV.[TABLE_NAME],CLV.ORDINAL_POSITION
