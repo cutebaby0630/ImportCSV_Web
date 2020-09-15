@@ -139,8 +139,8 @@ C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\obj\Debug\net
 C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\obj\Debug\netcoreapp3.1\ImportCSV_Web.core.dll
 C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\obj\Debug\netcoreapp3.1\ImportCSV_Web.core.pdb
 C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\obj\Debug\netcoreapp3.1\ImportCSV_Web.core.genruntimeconfig.cache
-C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\obj\Debug\netcoreapp3.1\ImportCSV_Web.core.csproj.CoreCompileInputs.cache
-C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\obj\Debug\netcoreapp3.1\ImportCSV_Web.core.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\bin\Debug\netcoreapp3.1\package-lock.json
 C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\bin\Debug\netcoreapp3.1\package.json
 C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\bin\Debug\netcoreapp3.1\static\manifest.json
+C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\obj\Debug\netcoreapp3.1\ImportCSV_Web.core.csproj.CoreCompileInputs.cache
+C:\Users\v-vyin\source\repos\ImportCSV_Web.core\ImportCSV_Web.core\obj\Debug\netcoreapp3.1\ImportCSV_Web.core.MvcApplicationPartsAssemblyInfo.cache

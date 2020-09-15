@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Home Page";
 }
 
@@ -44,11 +44,21 @@
     </div>
 </div>
 <input type="button" value="Submit" class="btn btn_submit" style="background-color: #CCDDFF; color:#194284;float:right;margin-top:10px;" />
-<form method="post" enctype="multipart/form-data">
-    <input type="file" name="img" />
-    <button>Submit</button>
-</form>
 
+<form method="POST" enctype="multipart/form-data" action="@Url.Action("Index")">
+  <div class="form-group">
+    
+    <div>
+      <p>上傳一個或多個檔案:</p>
+      <input type="file" name="files" multiple />
+    </div>
+  </div>
+  <div class="form-group">
+    <div>
+      <button type="submit" class="btn btn-primary">上傳</button>
+    </div>
+  </div>
+</form>
 
 <style>
     .fullcompare_box {
